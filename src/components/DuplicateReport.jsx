@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { List } from "react-window";
 import Badge from "./Badge";
 
@@ -43,9 +43,19 @@ function DupGroup({ dup, dr, showBorder }) {
 
 export default function DuplicateReport({ result }) {
   const dr = result;
+  const duplicates = useMemo(() => dr?.duplicates ?? [], [dr]);
+
+  const getItemHeight = useCallback(
+    (index) => {
+      const dup = duplicates[index];
+      return HEADER_HEIGHT + TABLE_HEADER_HEIGHT + dup.entries.length * ROW_HEIGHT + 4;
+    },
+    [duplicates]
+  );
+
   if (!dr) return null;
 
-  if (dr.duplicates.length === 0) {
+  if (duplicates.length === 0) {
     return (
       <div style={{ padding: 16, background: "#f0fdf4", borderTop: "1px solid #e2e8f0", fontSize: 13, color: "#166534" }}>
         ✓ No duplicates found in {dr.keyCol} across {dr.totalRows.toLocaleString()} rows.
@@ -53,41 +63,33 @@ export default function DuplicateReport({ result }) {
     );
   }
 
-  const getItemHeight = useCallback(
-    (index) => {
-      const dup = dr.duplicates[index];
-      return HEADER_HEIGHT + TABLE_HEADER_HEIGHT + dup.entries.length * ROW_HEIGHT + 4;
-    },
-    [dr.duplicates]
-  );
-
-  const totalHeight = dr.duplicates.reduce((sum, dup) => sum + HEADER_HEIGHT + TABLE_HEADER_HEIGHT + dup.entries.length * ROW_HEIGHT + 4, 0);
+  const totalHeight = duplicates.reduce((sum, dup) => sum + HEADER_HEIGHT + TABLE_HEADER_HEIGHT + dup.entries.length * ROW_HEIGHT + 4, 0);
   const listHeight = Math.min(totalHeight, MAX_LIST_HEIGHT);
 
-  const useVirtualization = dr.duplicates.length > 50;
+  const useVirtualization = duplicates.length > 50;
 
   return (
     <div style={{ borderTop: "1px solid #e2e8f0" }}>
       <div style={{ padding: "12px 16px", background: "#fefce8", fontSize: 13, color: "#854d0e" }}>
-        ⚠ {dr.duplicates.length} duplicate {dr.keyCol} value{dr.duplicates.length !== 1 ? "s" : ""} found ({dr.duplicates.reduce((s, d) => s + d.count, 0)} total rows affected)
+        ⚠ {duplicates.length} duplicate {dr.keyCol} value{duplicates.length !== 1 ? "s" : ""} found ({duplicates.reduce((s, d) => s + d.count, 0)} total rows affected)
       </div>
       {useVirtualization ? (
         <List
           height={listHeight}
-          itemCount={dr.duplicates.length}
+          itemCount={duplicates.length}
           itemHeight={getItemHeight}
           width="100%"
           overscanCount={5}
         >
           {({ index, style }) => (
             <div style={style}>
-              <DupGroup dup={dr.duplicates[index]} dr={dr} showBorder={index > 0} />
+              <DupGroup dup={duplicates[index]} dr={dr} showBorder={index > 0} />
             </div>
           )}
         </List>
       ) : (
         <div style={{ maxHeight: MAX_LIST_HEIGHT, overflow: "auto" }}>
-          {dr.duplicates.map((dup, di) => (
+          {duplicates.map((dup, di) => (
             <DupGroup key={di} dup={dup} dr={dr} showBorder={di > 0} />
           ))}
         </div>
