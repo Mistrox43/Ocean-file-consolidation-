@@ -43,11 +43,14 @@ export default function App() {
         rafId = requestAnimationFrame(() => {
           rafId = null;
           if (latestProgress) {
-            setProgress((prev) => ({
-              ...prev,
-              current: latestProgress.rowsProcessed,
-              total: latestProgress.totalRows || prev?.total,
-            }));
+            setProgress((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                current: latestProgress.rowsProcessed,
+                total: latestProgress.totalRows || prev.total,
+              };
+            });
           }
         });
       }
