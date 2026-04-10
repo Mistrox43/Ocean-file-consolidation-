@@ -41,6 +41,14 @@ function DupGroup({ dup, dr, showBorder }) {
   );
 }
 
+function DupGroupRow({ index, style, duplicates, dr }) {
+  return (
+    <div style={style}>
+      <DupGroup dup={duplicates[index]} dr={dr} showBorder={index > 0} />
+    </div>
+  );
+}
+
 export default function DuplicateReport({ result }) {
   const dr = result;
   const duplicates = useMemo(() => dr?.duplicates ?? [], [dr]);
@@ -75,18 +83,13 @@ export default function DuplicateReport({ result }) {
       </div>
       {useVirtualization ? (
         <List
-          height={listHeight}
-          itemCount={duplicates.length}
-          itemHeight={getItemHeight}
-          width="100%"
+          style={{ height: listHeight, width: "100%" }}
+          rowComponent={DupGroupRow}
+          rowCount={duplicates.length}
+          rowHeight={getItemHeight}
+          rowProps={{ duplicates, dr }}
           overscanCount={5}
-        >
-          {({ index, style }) => (
-            <div style={style}>
-              <DupGroup dup={duplicates[index]} dr={dr} showBorder={index > 0} />
-            </div>
-          )}
-        </List>
+        />
       ) : (
         <div style={{ maxHeight: MAX_LIST_HEIGHT, overflow: "auto" }}>
           {duplicates.map((dup, di) => (
