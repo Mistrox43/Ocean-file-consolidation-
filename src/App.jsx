@@ -95,8 +95,7 @@ export default function App() {
         const fileId = crypto.randomUUID();
         setProgress({ action: "parsing", label: `Parsing ${file.name}...`, current: 0, total: null });
         try {
-          const text = await file.text();
-          const result = await bridge.parseFile(fileId, text, ra.name, ra.number, ra.org);
+          const result = await bridge.parseFile(fileId, file, ra.name, ra.number, ra.org);
           newMetas.push({
             id: fileId,
             fileName: file.name,
@@ -141,8 +140,7 @@ export default function App() {
         const fileId = crypto.randomUUID();
         setProgress({ action: "parsing", label: `Parsing ${file.name}...`, current: 0, total: null });
         try {
-          const text = await file.text();
-          const result = await bridge.parseFile(fileId, text, ra.name, ra.number, ra.org);
+          const result = await bridge.parseFile(fileId, file, ra.name, ra.number, ra.org);
           newMetas.push({
             id: fileId,
             fileName: file.name,

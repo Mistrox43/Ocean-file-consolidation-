@@ -42,8 +42,8 @@ export class WorkerBridge {
     this.progressCallback = callback;
   }
 
-  parseFile(fileId, text, raName, raNumber, raOrg) {
-    return this._send("parseFile", { fileId, text, raName, raNumber, raOrg });
+  parseFile(fileId, file, raName, raNumber, raOrg) {
+    return this._send("parseFile", { fileId, file, raName, raNumber, raOrg });
   }
 
   removeFile(fileId) {
